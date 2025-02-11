@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google OAuth Client</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -12,44 +13,25 @@
     <!-- Google Sign-In Button -->
     <div id="google-signin-button"></div>
 
-    <!-- Include the Google API script -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-
     <script>
-        // Google Sign-In configuration
-        function startApp() {
-            gapi.auth2.init({
-                client_id: '273847696094-inaafp42c5r21d07mg0pgo3itrkhrp6o.apps.googleusercontent.com',
-            }).then(function () {
-                // Render the Google Sign-In button
-                gapi.signin2.render('google-signin-button', {
-                    'scope': 'profile email',
-                    'longtitle': true,
-                    'theme': 'dark',
-                    'onsuccess': onSignIn,
-                    'onfailure': onSignInFailure
-                });
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            alert("Login Successful!\nToken: " + response.credential);
+        }
+
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "273847696094-inaafp42c5r21d07mg0pgo3itrkhrp6o.apps.googleusercontent.com",
+                callback: handleCredentialResponse
             });
-        }
 
-        // Success callback
-        function onSignIn(googleUser) {
-            var profile = googleUser.getBasicProfile();
-            console.log("ID: " + profile.getId());
-            console.log("Name: " + profile.getName());
-            console.log("Email: " + profile.getEmail());
+            google.accounts.id.renderButton(
+                document.getElementById("google-signin-button"),
+                { theme: "outline", size: "large" }
+            );
 
-            // Redirect to your callback URL (set in your OAuth provider)
-            window.location.href = 'https://satishsharma82.github.io/google-oauth-client-test/callback?token=' + googleUser.getAuthResponse().id_token;
-        }
-
-        // Failure callback
-        function onSignInFailure(error) {
-            console.log(error);
-        }
-
-        // Initialize the Google Sign-In client
-        startApp();
+            google.accounts.id.prompt();
+        };
     </script>
 
 </body>
